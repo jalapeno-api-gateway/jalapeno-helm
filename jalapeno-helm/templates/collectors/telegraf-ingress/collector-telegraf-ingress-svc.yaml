@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.collectors.telegrafIngress.name }}"
+  annotations:
+  {{- if .Values.collectors.telegrafIngress.service.annotations }}
+  {{- toYaml .Values.collectors.telegrafIngress.service.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.collectors.telegrafIngress.service.loadBalancerIP }}
+  ports:
+  - name: 57400-tcp
+    protocol: TCP
+    port: {{ .Values.collectors.telegrafIngress.port }}
+    # nodePort: {{ .Values.collectors.telegrafIngress.nodePort }}
+    targetPort: 57400
+  selector:
+    app: "{{ .Values.collectors.telegrafIngress.name }}"
