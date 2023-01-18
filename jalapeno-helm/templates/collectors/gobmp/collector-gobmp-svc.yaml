@@ -3,19 +3,25 @@ kind: Service
 spec:
   ports:
   - name: incbmpsess
-    #nodePort: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
-    port: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
+    port: 5000
     protocol: TCP
     targetPort: 5000
+    {{- if and .Values.collectors.gobmp.service.nodePort (eq .Values.collectors.gobmp.service.type "NodePort") }}
+    nodePort: {{ .Values.collectors.gobmp.service.nodePort.incomingBMPSessions }}
+    {{- end }}
   - name: perfmon
-    #nodePort: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
-    port: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
+    port: 56767
     protocol: TCP
     targetPort: 56767
+    {{- if and .Values.collectors.gobmp.service.nodePort (eq .Values.collectors.gobmp.service.type "NodePort") }}
+    nodePort: {{ .Values.collectors.gobmp.service.nodePort.performanceMonitoring }}
+    {{- end }}
   selector:
     app: "{{ .Values.collectors.gobmp.name }}"
-  type: LoadBalancer
+  type: {{ .Values.collectors.gobmp.service.type }}
+  {{- if and .Values.collectors.gobmp.service.loadBalancerIP (eq .Values.collectors.gobmp.service.type "LoadBalancer") }}
   loadBalancerIP: {{ .Values.collectors.gobmp.service.loadBalancerIP }}
+  {{- end }}
 metadata:
   name: "{{ .Values.collectors.gobmp.name }}"
   annotations:

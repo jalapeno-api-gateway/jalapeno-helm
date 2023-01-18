@@ -7,13 +7,17 @@ metadata:
   {{- toYaml .Values.collectors.telegrafIngress.service.annotations | nindent 4 }}
   {{- end }}
 spec:
-  type: LoadBalancer
+  type: {{ .Values.collectors.telegrafIngress.service.type }}
+  {{- if and .Values.collectors.telegrafIngress.service.loadBalancerIP (eq .Values.collectors.telegrafIngress.service.type "LoadBalancer") }}
   loadBalancerIP: {{ .Values.collectors.telegrafIngress.service.loadBalancerIP }}
+  {{- end }}
   ports:
   - name: 57400-tcp
     protocol: TCP
-    port: {{ .Values.collectors.telegrafIngress.port }}
-    # nodePort: {{ .Values.collectors.telegrafIngress.nodePort }}
+    port: 57400
     targetPort: 57400
+    {{- if and .Values.collectors.telegrafIngress.service.nodePort (eq .Values.collectors.telegrafIngress.service.type "NodePort") }}
+    nodePort: {{ .Values.collectors.telegrafIngress.service.nodePort }}
+    {{- end }}
   selector:
     app: "{{ .Values.collectors.telegrafIngress.name }}"
