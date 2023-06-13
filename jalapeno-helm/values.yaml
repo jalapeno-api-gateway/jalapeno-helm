@@ -51,6 +51,17 @@ processors:
     #   limits:
     #     memory:
     #     cpu:
+  linkstateEdge:
+    name: linkstate-edge
+    replicas: 1
+    image: docker.io/iejalapeno/linkstate-edge:latest
+    # resources:
+    #   requests:
+    #     memory:
+    #     cpu:
+    #   limits:
+    #     memory:
+    #     cpu:
   telegrafEgress:
     name: telegraf-egress
     replicas: 1
