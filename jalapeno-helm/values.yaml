@@ -24,7 +24,7 @@ collectors:
   telegrafIngress:
     name: telegraf-ingress
     replicas: 1
-    image: telegraf:1.15-alpine
+    image: telegraf:1.29-alpine
     imagePullSecret: regcred
     port: 32400
     # resources:
@@ -43,7 +43,7 @@ processors:
   lslinknodeEdge:
     name: lslinknode-edge
     replicas: 1
-    image: docker.io/iejalapeno/lslinknode-edge:latest
+    image: ghcr.io/jalapeno-api-gateway/jalapeno/lslinknode-edge:v1.0.0
     # resources:
     #   requests:
     #     memory:
@@ -54,7 +54,7 @@ processors:
   telegrafEgress:
     name: telegraf-egress
     replicas: 1
-    image: telegraf:1.15-alpine
+    image: telegraf:1.29-alpine
     imagePullSecret: regcred
     # resources:
     #   requests:
@@ -66,7 +66,7 @@ processors:
   topology:
     name: topology
     replicas: 1
-    image: docker.io/iejalapeno/topology:latest
+    image: ghcr.io/jalapeno-api-gateway/jalapeno/topology:v1.0.0
     # resources:
     #   requests:
     #     memory:
@@ -79,7 +79,7 @@ arangodb:
   image:
     registry: docker.io
     repository: arangodb
-    tag: 3.6.12
+    tag: 3.11.7
   arangodb:
     service:
       type: ClusterIP
@@ -106,7 +106,7 @@ influxdb:
   image:
     repository: bitnami/influxdb
     #tag: 2.0.7-debian-10-r34
-    tag: 1.7.8-r24 # newest release for oldest influxdb version
+    tag: 1.8.5 # newest release for oldest influxdb version
   auth:
     admin:
       username: admin
@@ -142,7 +142,7 @@ grafana:
   fullnameOverride: grafana
   image:
     repository: bitnami/grafana
-    tag: 8.0.6-debian-10-r0
+    tag: 10.3.1-debian-11-r2
   admin:
     user: root
     password: jalapeno
