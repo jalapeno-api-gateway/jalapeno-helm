@@ -1,6 +1,6 @@
 <h1 align="center">Jalapeno Helm Chart</h1>
 <p align="center">
-	<img src="https://raw.githubusercontent.com/cisco-open/jalapeno/main/docs/diagrams/jalapeno_architecture.png">
+	<img src="https://github.com/cisco-open/jalapeno/blob/main/docs/img/jalapeno_architecture.png">
 </p>
 
 <p align="center">
@@ -21,7 +21,3 @@ In order to use the Helm chart as is, a Kubernetes load balancer is needed.
 If the arangoDB gets changed the ArangoDB Chart has to be rebuild and copied into the charts folder of the Jalapeno Chart.
 
 - build ArangoDB Chart: ``helm package .``
-
-## Known Bugs
-- arangodb works only with image tag ``3.6.12``
-- influxdb has to be set to version ``1.7``
