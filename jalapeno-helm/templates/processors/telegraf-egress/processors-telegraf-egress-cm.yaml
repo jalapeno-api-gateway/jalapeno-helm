@@ -30,8 +30,6 @@ data:
       timeout = "5s"
 
     [[outputs.file]]
-      # Telegraf 1.29 crashes as it can not write to "metrics.out". Following default outputs.file configuration:
-      # https://github.com/influxdata/telegraf/blob/ee18866f3552bbc1debf25ce4e814efbb607d957/plugins/outputs/file/README.md
       files = ["stdout", "/tmp/metrics.out"]
       rotation_interval = "1h"
       rotation_max_size = "20MB"
