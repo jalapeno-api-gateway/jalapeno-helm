@@ -27,11 +27,10 @@ data:
       database = "{{ (index .Values.influxdb.influxdb.extraEnvVars 0).value }}"
       username = "{{ (index .Values.influxdb.influxdb.extraEnvVars 1).value }}"
       password = "{{ (index .Values.influxdb.influxdb.extraEnvVars 2).value }}"
-      precision = "s"
       timeout = "5s"
 
     [[outputs.file]]
-      files = ["metrics.out"]
+      files = ["stdout", "/tmp/metrics.out"]
       rotation_interval = "1h"
       rotation_max_size = "20MB"
       rotation_max_archives = 3
