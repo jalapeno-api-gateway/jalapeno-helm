@@ -1,24 +1,39 @@
 apiVersion: v1
 kind: Service
+metadata:
+  name: {{ .Values.collectors.gobmp.name }}
+  {{- if .Values.collectors.gobmp.service.annotations }}
+  annotations:
+  {{- toYaml .Values.collectors.gobmp.service.annotations | nindent 4 }}
+  {{- end }}
 spec:
+  {{- if (or (eq .Values.collectors.gobmp.service.type "ClusterIP") (empty .Values.collectors.gobmp.service.type)) }}
+  type: ClusterIP
+  {{- with .Values.collectors.gobmp.service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- else if eq .Values.collectors.gobmp.service.type "LoadBalancer" }}
+  type: LoadBalancer
+  {{- with .Values.collectors.gobmp.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- else }}
+  type: {{ .Values.collectors.gobmp.service.type }}
+  {{- end }}
   ports:
   - name: incbmpsess
-    #nodePort: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
+    protocol: TCP
     port: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
-    protocol: TCP
     targetPort: 5000
-  - name: perfmon
-    #nodePort: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
-    port: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
-    protocol: TCP
-    targetPort: 56767
-  selector:
-    app: "{{ .Values.collectors.gobmp.name }}"
-  type: LoadBalancer
-  loadBalancerIP: {{ .Values.collectors.gobmp.service.loadBalancerIP }}
-metadata:
-  name: "{{ .Values.collectors.gobmp.name }}"
-  annotations:
-    {{- if .Values.collectors.gobmp.service.annotations }}
-    {{- toYaml .Values.collectors.gobmp.service.annotations | nindent 4 }}
+    {{- if (and (eq .Values.collectors.gobmp.service.type "NodePort") (not (empty .Values.collectors.gobmp.ports.incomingBMPSessions ))) }}
+    nodePort: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
     {{- end }}
+  - name: perfmon
+    protocol: TCP
+    port: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
+    targetPort: 56767
+    {{- if (and (eq .Values.collectors.gobmp.service.type "NodePort") (not (empty .Values.collectors.gobmp.ports.performanceMonitoring ))) }}
+    nodePort: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
+    {{- end }}
+  selector:
+    app: {{ .Values.collectors.gobmp.name }}

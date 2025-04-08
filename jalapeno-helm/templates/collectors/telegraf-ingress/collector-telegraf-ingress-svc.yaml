@@ -1,19 +1,32 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ .Values.collectors.telegrafIngress.name }}"
-  annotations:
+  name: {{ .Values.collectors.telegrafIngress.name }}
   {{- if .Values.collectors.telegrafIngress.service.annotations }}
+  annotations:
   {{- toYaml .Values.collectors.telegrafIngress.service.annotations | nindent 4 }}
   {{- end }}
 spec:
+  {{- if (or (eq .Values.collectors.telegrafIngress.service.type "ClusterIP") (empty .Values.collectors.telegrafIngress.service.type)) }}
+  type: ClusterIP
+  {{- with .Values.collectors.telegrafIngress.service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- else if eq .Values.collectors.telegrafIngress.service.type "LoadBalancer" }}
   type: LoadBalancer
-  loadBalancerIP: {{ .Values.collectors.telegrafIngress.service.loadBalancerIP }}
+  {{- with .Values.collectors.telegrafIngress.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- else }}
+  type: {{ .Values.collectors.telegrafIngress.service.type }}
+  {{- end }}
   ports:
   - name: 57400-tcp
     protocol: TCP
     port: {{ .Values.collectors.telegrafIngress.port }}
-    # nodePort: {{ .Values.collectors.telegrafIngress.nodePort }}
     targetPort: 57400
+    {{- if (and (eq .Values.collectors.telegrafIngress.service.type "NodePort") (not (empty .Values.collectors.telegrafIngress.port))) }}
+    nodePort: {{ .Values.collectors.telegrafIngress.port }}
+    {{- end }}
   selector:
-    app: "{{ .Values.collectors.telegrafIngress.name }}"
+    app: {{ .Values.collectors.telegrafIngress.name }}
