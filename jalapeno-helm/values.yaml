@@ -6,6 +6,7 @@ collectors:
     name: gobmp
     replicas: 1
     image: docker.io/sbezverk/gobmp:latest
+    ## 'port' (and optionally 'nodePort') of service
     ports:
       incomingBMPSessions: 30511
       performanceMonitoring: 30767
@@ -17,15 +18,22 @@ collectors:
         memory: 1024Mi
         cpu: 1
     service:
+      ## Service type can be one of { ClusterIP, LoadBalancer, NodePort }
+      type: LoadBalancer
+      ## Configuration for service type 'LoadBalancer'
       loadBalancerIP: 172.16.19.64
+      ## Configuration for service type 'ClusterIP'
+      # clusterIP: 10.152.183.244
+      ## Optional annotations
       annotations:
         metallb.universe.tf/address-pool: load-balanced
 
   telegrafIngress:
     name: telegraf-ingress
     replicas: 1
-    image: telegraf:1.29-alpine
+    image: docker.io/telegraf:1.29-alpine
     imagePullSecret: regcred
+    ## 'port' (and optionally 'nodePort') of service
     port: 32400
     # resources:
     #   requests:
@@ -35,7 +43,13 @@ collectors:
     #     memory:
     #     cpu:
     service:
+      ## Service type can be one of { ClusterIP, LoadBalancer, NodePort }
+      type: LoadBalancer
+      ## Configuration for service type 'LoadBalancer'
       loadBalancerIP: 172.16.19.65
+      ## Configuration for service type 'ClusterIP'
+      # clusterIP: 10.152.183.1
+      ## Optional annotations
       annotations:
         metallb.universe.tf/address-pool: load-balanced
 
@@ -54,7 +68,7 @@ processors:
   telegrafEgress:
     name: telegraf-egress
     replicas: 1
-    image: telegraf:1.29-alpine
+    image: docker.io/telegraf:1.29-alpine
     imagePullSecret: regcred
     # resources:
     #   requests:
