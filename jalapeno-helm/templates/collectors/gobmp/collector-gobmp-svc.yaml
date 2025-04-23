@@ -21,14 +21,14 @@ spec:
   type: {{ .Values.collectors.gobmp.service.type }}
   {{- end }}
   ports:
-  - name: incomingBMPSessions
+  - name: incbmpsess
     protocol: TCP
     port: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
     targetPort: 5000
     {{- if (and (eq .Values.collectors.gobmp.service.type "NodePort") (not (empty .Values.collectors.gobmp.ports.incomingBMPSessions ))) }}
     nodePort: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
     {{- end }}
-  - name: performanceMonitoring
+  - name: perfmon
     protocol: TCP
     port: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
     targetPort: 56767
