@@ -17,7 +17,7 @@ collectors:
         memory: 1024Mi
         cpu: 1
     service:
-      loadBalancerIP: 172.16.19.64
+      loadBalancerIP: 10.5.0.129
       annotations:
         metallb.universe.tf/address-pool: load-balanced
 
@@ -35,7 +35,7 @@ collectors:
     #     memory:
     #     cpu:
     service:
-      loadBalancerIP: 172.16.19.65
+      loadBalancerIP: 10.5.0.130
       annotations:
         metallb.universe.tf/address-pool: load-balanced
 
@@ -97,45 +97,57 @@ arangodb:
   databaseUser: root
   databasePassword: jalapeno
 
-# Official bitnami/stable charts
-# The charts are defined in the Charts.yaml as dependency
+storage:
+  influxdb:
+    image: influxdb:1.12.1-alpine
+    persistence:
+      enabled: true
+      size: 10Gi
+    externalAccess:
+      enabled: true
+      service: 
+        type: LoadBalancer
+        loadBalancerIP: 10.5.0.133
+    database: mdt_db
+    user: jalapeno
+    password: jalapeno
 
 # https://github.com/bitnami/charts/tree/master/bitnami/influxdb
-influxdb:
-  fullnameOverride: influxdb
-  image:
-    repository: bitnami/influxdb
-    #tag: 2.0.7-debian-10-r34
-    tag: 1.8.5 # newest release for oldest influxdb version
-  auth:
-    admin:
-      username: admin
-      password: gsplabgsplab
-  influxdb:
-    extraEnvVars:
-      # Don't change the ordering!
-      # - name: INFLUXDB_DB
-      #   value: "mdt_db"
-      # - name: INFLUXDB_USER
-      #   value: jalapeno
-      # - name: INFLUXDB_USER_PASSWORD
-      #   value: jalapeno
-      - name: INFLUXDB_DB
-        value: "mdt_db"
-      - name: INFLUXDB_USER
-        value: "jalapeno"
-      - name: INFLUXDB_USER_PASSWORD
-        value: "jalapeno"
-    replicaCount: 1
-    # service:
-    #   type: NodePort
-    #   nodePorts:
-    #     http: 30308
-    service:
-      type: ClusterIP
-      ports:
-        http: 8086
-        rpc: 8088
+# influxdb:
+#   fullnameOverride: influxdb
+#   image:
+#     repository: bitnami/influxdb
+#     #tag: 2.0.7-debian-10-r34
+#     tag: 1.8.5 # newest release for oldest influxdb version
+#   auth:
+#     admin:
+#       username: admin
+#       password: gsplabgsplab
+#   influxdb:
+#     extraEnvVars:
+#       # Don't change the ordering!
+#       # - name: INFLUXDB_DB
+#       #   value: "mdt_db"
+#       # - name: INFLUXDB_USER
+#       #   value: jalapeno
+#       # - name: INFLUXDB_USER_PASSWORD
+#       #   value: jalapeno
+#       - name: INFLUXDB_DB
+#         value: "mdt_db"
+#       - name: INFLUXDB_USER
+#         value: "jalapeno"
+#       - name: INFLUXDB_USER_PASSWORD
+#         value: "jalapeno"
+#     replicaCount: 1
+#     # service:
+#     #   type: NodePort
+#     #   nodePorts:
+#     #     http: 30308
+#     service:
+#       type: ClusterIP
+#       ports:
+#         http: 8086
+#         rpc: 8088
 
 # https://github.com/bitnami/charts/tree/master/bitnami/grafana
 grafana:
@@ -163,17 +175,24 @@ grafana:
         secretName: ingress-certificate-secret-prod
 
 # https://github.com/bitnami/charts/tree/master/bitnami/kafka
-kafka:
-  fullnameOverride: kafka
-  image:
-    repository: bitnami/kafka
-    tag: 2.8.0-debian-10-r57
-  replicacount: 1
-  # service:
-  #   type: NodePort
-  # externalAccess:
-  #   enabled: true
-  #   service:
-  #     type: NodePort
-  #     nodePorts:
-  #       - 30092
+messaging: 
+  kafka:
+    name: kafka
+    image: apache/kafka:4.0.1-rc2
+    replicas: 1
+    persistence:
+      enabled: true
+      size: 10Gi
+    externalAccess:
+      enabled: true
+      service:
+        type: LoadBalancer
+        loadBalancerIP: 10.5.0.131
+
+  kafkaUi:
+    enabled: true
+    image: ghcr.io/kafbat/kafka-ui:latest
+    service:
+      type: LoadBalancer
+      loadBalancerIP: 10.5.0.132
+    

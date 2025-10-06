@@ -1,0 +1,27 @@
+{{ with .Values.messaging.kafkaUi }}
+{{ if .enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:  
+      app.kubernetes.io/name: kafka-ui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kafka-ui
+    spec:
+      containers:
+        - name: kafka-ui
+          image: {{ .image }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP 
+          envFrom:
+            - configMapRef:
+                name: kafka-ui-config
+{{ end }}
+{{ end }}

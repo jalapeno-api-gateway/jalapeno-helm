@@ -1,0 +1,31 @@
+messaging: 
+  kafka:
+    image: apache/kafka:4.0.1-rc2
+    replicas: 1
+    persistence:
+      size: 10Gi
+    externalAccess: # Default is disabled
+        type: LoadBalancer # Default is ClusterIP
+        loadBalancerIP: 10.5.0.131
+
+  kafkaUi:
+    enabled: true
+    image: ghcr.io/kafbat/kafka-ui:latest
+    externalAccess:
+      type: LoadBalancer
+      loadBalancerIP: 10.5.0.132
+
+storage:
+  influxdb:
+    image: influxdb:1.12.2-alpine
+    # persistence:
+    #   size: 10Gi
+    # externalAccess:
+    #   type: LoadBalancer
+      # loadBalancerIP: 10.5.0.133
+    # database: mdt_db
+    # user: jalapeno
+    # password: jalapeno
+
+
+    # TODO: remove all enabled -> if the value is there, it is enabled otherwise not

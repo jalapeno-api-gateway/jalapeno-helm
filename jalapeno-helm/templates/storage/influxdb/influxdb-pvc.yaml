@@ -1,0 +1,14 @@
+{{ with .Values.storage.influxdb }}
+{{ if .persistence }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .persistence.size }}
+{{ end }}
+{{ end }}

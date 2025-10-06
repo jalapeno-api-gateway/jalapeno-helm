@@ -1,0 +1,14 @@
+{{ with .Values.messaging.kafka }}
+{{ if .persistence }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "{{ .persistence.size }}"
+{{ end }}
+{{ end }}
