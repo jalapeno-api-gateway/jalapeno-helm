@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+spec:
+  ports:
+  - name: incbmpsess
+    port: {{ .Values.collectors.gobmp.ports.incomingBMPSessions }}
+    protocol: TCP
+    targetPort: 5000
+  - name: perfmon
+    port: {{ .Values.collectors.gobmp.ports.performanceMonitoring }}
+    protocol: TCP
+    targetPort: 56767
+  selector:
+    app: gobmp
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.collectors.gobmp.service.loadBalancerIP }}
+metadata:
+  name: gobmp

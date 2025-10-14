@@ -1,0 +1,9 @@
+{{ if .Values.messaging.kafkaUi.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-ui-config
+data:
+  KAFKA_CLUSTERS_0_NAME: jalapeno
+  KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-headless.{{ .Release.Namespace }}:9092
+{{ end }}

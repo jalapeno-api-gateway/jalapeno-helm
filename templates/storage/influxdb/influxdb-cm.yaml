@@ -1,0 +1,12 @@
+{{ with .Values.storage.influxdb }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-config
+data:
+  INFLUXDB_DB: {{ .database | default "mdt_db" }}
+  INFLUXDB_ADMIN_USER: {{ .user | default "admin" }}
+  INFLUXDB_ADMIN_PASSWORD: {{ .password | default "jalapeno" }}
+  INFLUXDB_USER: {{ .user | default "admin" }}
+  INFLUXDB_USER_PASSWORD: {{ .userPassword | default "jalapeno" }}
+{{ end }}

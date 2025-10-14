@@ -1,0 +1,27 @@
+{{ with .Values.storage.arangodb}}
+{{ if .persistence }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: arangodb-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .persistence.dataSize }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: arangodb-apps-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .persistence.appsSize }}
+{{ end }}
+{{ end }}
+

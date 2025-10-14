@@ -1,0 +1,12 @@
+{{ with .Values.storage.arangodb }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arangodb-config
+data:
+  {{- if and .auth .auth.rootPassword }}
+  ARANGO_ROOT_PASSWORD: {{ .auth.rootPassword }}
+  {{- else }}
+  ARANGO_ROOT_PASSWORD: jalapeno
+  {{- end }}
+{{ end }}

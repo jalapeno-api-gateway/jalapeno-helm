@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: arangodb-create-db
+  namespace: jalapeno
+spec:
+  template:
+    spec:
+      containers:
+        - name: arangosh
+          image: {{ .Values.storage.arangodb.image }}
+          command: ["arangosh"]
+          args:
+            - --server.endpoint
+            - tcp://arangodb:8529
+            - --server.username
+            - root
+            - --server.password
+            - jalapeno
+            - --javascript.execute-string
+            - 'db._createDatabase("jalapeno")'
+      restartPolicy: OnFailure

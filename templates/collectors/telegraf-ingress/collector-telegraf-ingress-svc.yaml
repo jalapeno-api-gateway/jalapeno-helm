@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: telegraf-ingress
+  annotations:
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.collectors.telegrafIngress.service.loadBalancerIP }}
+  ports:
+  - name: 57400-tcp
+    protocol: TCP
+    port: {{ .Values.collectors.telegrafIngress.port }}
+    targetPort: 57400 # configured telegraf service port 
+  selector:
+    app: telegraf-ingress

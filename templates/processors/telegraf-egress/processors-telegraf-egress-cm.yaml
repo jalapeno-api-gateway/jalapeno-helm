@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-egress-config
+data:
+  telegraf.conf: |
+    [agent]
+      interval = "10s"
+      round_interval = true
+      metric_buffer_limit = 10000
+      flush_buffer_when_full = true
+      collection_jitter = "0s"
+      flush_interval = "10s"
+      flush_jitter = "0s"
+      debug = false
+      quiet = false
+      hostname = "telegraf"
+
+    [[inputs.kafka_consumer]]
+      brokers = ["kafka-headless.{{ .Release.Namespace }}:9092"]
+      topics = ["jalapeno.telemetry"]
+      max_message_len = 1000000
+      data_format = "influx"
+
+    [[outputs.influxdb]]
+      urls = ["http://influxdb.{{ .Release.Namespace }}:8086"]
+      database = "{{ .Values.storage.influxdb.database | default "mtd_db" }}"
+      username = "{{ .Values.storage.influxdb.user | default "jalapeno" }}"
+      password = "{{ .Values.storage.influxdb.password | default "jalapeno" }}"
+      precision = "s"
+      timeout = "5s"
+
+    [[outputs.file]]
+      files = ["stdout"]
+      rotation_interval = "1h"
+      rotation_max_size = "20MB"
+      rotation_max_archives = 3

@@ -1,0 +1,130 @@
+# Self maintained charts /template
+ingressSecretName: ingress-certificate-secret-prod
+
+collectors:
+  gobmp:
+    replicas: 1
+    image: docker.io/sbezverk/gobmp:debug_03_07_2024
+    ports:
+      incomingBMPSessions: 30511
+      performanceMonitoring: 30767
+    resources:
+      requests:
+        memory: 50Mi
+        cpu: 10m
+      limits:
+        memory: 1024Mi
+        cpu: 1
+    service:
+      loadBalancerIP: 10.5.0.129
+
+  telegrafIngress:
+    name: telegraf-ingress
+    replicas: 1
+    image: telegraf:1.36-alpine
+    imagePullSecret: regcred
+    port: 32400
+    # resources:
+    #   requests:
+    #     memory:
+    #     cpu:
+    #   limits:
+    #     memory:
+    #     cpu:
+    service:
+      loadBalancerIP: 10.5.0.130
+
+processors:
+  lslinknodeEdge:
+    name: linkstate-edge
+    replicas: 1
+    image: docker.io/iejalapeno/linkstate-edge:latest
+    # resources:
+    #   requests:
+    #     memory:
+    #     cpu:
+    #   limits:
+    #     memory:
+    #     cpu:
+  telegrafEgress:
+    name: telegraf-egress
+    replicas: 1
+    image: telegraf:1.36-alpine
+    imagePullSecret: regcred
+    # resources:
+    #   requests:
+    #     memory:
+    #     cpu:
+    #   limits:
+    #     memory:
+    #     cpu:
+  topology:
+    name: topology
+    replicas: 1
+    image: docker.io/iejalapeno/topology:latest
+    # resources:
+    #   requests:
+    #     memory:
+    #     cpu:
+    #   limits:
+    #     memory:
+    #     cpu:
+
+storage:
+  arangodb:
+    image: arangodb:3.12.5.2
+    persistence:
+      dataSize: 10Gi
+      appsSize: 10Gi
+    externalAccess:
+      type: LoadBalancer
+      loadBalancerIP: 10.5.0.131
+      # nodePort: 30852
+    # auth:
+        # rootPassword: jalapeno # default is "jalapeno"
+
+  influxdb:
+    image: influxdb:1.12.2-alpine
+    persistence:
+      size: 10Gi
+    externalAccess:
+      type: LoadBalancer
+      loadBalancerIP: 10.5.0.132
+      # type: NodePort
+      # nodePort: 30308
+    # database: mdt_db # default is "mdt_db"
+    # user: admin # default is "admin"
+    # password: jalapeno # default is "jalapeno" 
+
+messaging: 
+  kafka:
+    name: kafka
+    image: apache/kafka:3.9.1
+    replicas: 1
+    persistence:
+      enabled: true
+      size: 10Gi
+    externalAccess:
+      enabled: true
+      service:
+        type: LoadBalancer
+        loadBalancerIP: 10.5.0.133
+
+  kafkaUi:
+    enabled: true
+    image: ghcr.io/kafbat/kafka-ui:latest
+    service:
+      type: LoadBalancer
+      loadBalancerIP: 10.5.0.134
+
+grafana:
+  persistence:
+    enabled: true
+    type: pvc
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_role: Admin 
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 10.5.0.135

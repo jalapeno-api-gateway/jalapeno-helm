@@ -1,0 +1,60 @@
+{{ with .Values.messaging.kafka }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  labels:
+    app.kubernetes.io/name: kafka
+spec:
+  serviceName: kafka-headless
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kafka
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: {{ .image }}
+          ports:
+            - name: kafka-broker
+              containerPort: 9092
+            - name: kafka-control
+              containerPort: 9093
+            - name: kafka-external
+              containerPort: 9094
+          {{ if .persistence }}
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /var/lib/kafka/data
+          {{ end }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              export KAFKA_NODE_ID=${STATEFULSET_ORDINAL:-$(hostname | awk -F'-' '{print $NF}')}
+              export KAFKA_LISTENERS="INTERNAL://kafka-$KAFKA_NODE_ID.kafka-headless:9092,CONTROLLER://kafka-$KAFKA_NODE_ID.kafka-headless:9093,EXTERNAL://0.0.0.0:9094"
+              if [ "{{ if .externalAccess }}true{{ else }}false{{ end }}" = "true" ]; then
+                export KAFKA_ADVERTISED_LISTENERS="INTERNAL://kafka-$KAFKA_NODE_ID.kafka-headless:9092,CONTROLLER://kafka-$KAFKA_NODE_ID.kafka-headless:9093,EXTERNAL://{{- .externalAccess.loadBalancerIP }}:9094"
+              else
+                export KAFKA_ADVERTISED_LISTENERS="INTERNAL://kafka-$KAFKA_NODE_ID.kafka-headless:9092,CONTROLLER://kafka-$KAFKA_NODE_ID.kafka-headless:9093"
+              fi
+              exec /etc/kafka/docker/run
+          envFrom:
+            - configMapRef:
+                name: kafka-config
+  {{ if .persistence }}
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-data
+        labels:
+          app.kubernetes.io/name: kafka
+      spec:
+        accessModes: [ ReadWriteOnce ]
+        resources:
+          requests:
+            storage: {{ .persistence.size }}
+  {{ end }}
+  {{ end }}

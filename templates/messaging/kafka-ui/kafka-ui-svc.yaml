@@ -1,0 +1,27 @@
+{{ with .Values.messaging.kafkaUi }}
+{{ if hasKey . "externalAccess" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  labels:
+    app.kubernetes.io/name: kafka-ui
+spec:
+  {{ with .externalAccess }}
+  type: {{ .type | default "NodePort" }}
+  {{ if and (eq .type "LoadBalancer") .loadBalancerIP }}
+  loadBalancerIP: {{ .loadBalancerIP }}
+  {{ end }}
+  ports:
+    - name: kafka-ui
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+      {{ if and (eq .type "NodePort") .nodePort }}
+      nodePort: {{ .nodePort }}
+      {{ end }}
+  {{ end }}
+  selector:
+    app.kubernetes.io/name: kafka-ui
+{{ end }}
+{{ end }}

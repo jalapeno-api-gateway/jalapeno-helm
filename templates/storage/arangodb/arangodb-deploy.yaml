@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arangodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:  
+      app.kubernetes.io/name: arangodb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: arangodb 
+    spec:
+      containers:
+        - name: arangodb 
+          image: {{ .Values.storage.arangodb.image }}
+          ports:
+            - name: http-api
+              containerPort: 8529
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: arangodb-config
+          volumeMounts:
+            - name: arangodb-data
+              mountPath: /data
+            - name: arangodb-apps
+              mountPath: /apps
+              
+      volumes:
+        - name: arangodb-data
+          persistentVolumeClaim:
+            claimName: arangodb-data-pvc
+        - name: arangodb-apps
+          persistentVolumeClaim:
+            claimName: arangodb-apps-pvc
