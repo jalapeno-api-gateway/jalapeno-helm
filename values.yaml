@@ -4,7 +4,7 @@ ingressSecretName: ingress-certificate-secret-prod
 collectors:
   gobmp:
     replicas: 1
-    image: docker.io/sbezverk/gobmp:debug_03_07_2024
+    image: docker.io/sbezverk/gobmp:latest
     ports:
       incomingBMPSessions: 30511
       performanceMonitoring: 30767
@@ -38,7 +38,8 @@ processors:
   lslinknodeEdge:
     name: linkstate-edge
     replicas: 1
-    image: docker.io/iejalapeno/linkstate-edge:latest
+    image: ghcr.io/jalapeno-api-gateway/jalapeno/linkstate-edge:v1.0.2-alpha
+    # image: docker.io/iejalapeno/linkstate-edge:latest
     # resources:
     #   requests:
     #     memory:
@@ -61,7 +62,9 @@ processors:
   topology:
     name: topology
     replicas: 1
-    image: docker.io/iejalapeno/topology:latest
+    image: ghcr.io/jalapeno-api-gateway/jalapeno/topology:v1.0.2-alpha
+    # image: docker.io/iejalapeno/topology:latest
+    # image: docker.io/iejalapeno/topology:test20250829
     # resources:
     #   requests:
     #     memory:
@@ -74,8 +77,8 @@ storage:
   arangodb:
     image: arangodb:3.12.5.2
     persistence:
-      dataSize: 10Gi
-      appsSize: 10Gi
+      dataSize: 1Gi
+      appsSize: 1Gi
     externalAccess:
       type: LoadBalancer
       loadBalancerIP: 10.5.0.131
@@ -86,7 +89,7 @@ storage:
   influxdb:
     image: influxdb:1.12.2-alpine
     persistence:
-      size: 10Gi
+      size: 1Gi
     externalAccess:
       type: LoadBalancer
       loadBalancerIP: 10.5.0.132
@@ -103,7 +106,7 @@ messaging:
     replicas: 1
     persistence:
       enabled: true
-      size: 10Gi
+      size: 1Gi
     externalAccess:
       enabled: true
       service:
@@ -121,6 +124,7 @@ grafana:
   persistence:
     enabled: true
     type: pvc
+    size: 1Gi
   grafana.ini:
     auth.anonymous:
       enabled: true
