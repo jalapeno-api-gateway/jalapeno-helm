@@ -1,5 +1,5 @@
 {{ with .Values.messaging.kafkaUi }}
-{{ if hasKey . "externalAccess" }}
+{{ if .enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,21 +7,23 @@ metadata:
   labels:
     app.kubernetes.io/name: kafka-ui
 spec:
-  {{ with .externalAccess }}
-  type: {{ .type | default "NodePort" }}
-  {{ if and (eq .type "LoadBalancer") .loadBalancerIP }}
-  loadBalancerIP: {{ .loadBalancerIP }}
-  {{ end }}
+  {{- if hasKey . "externalAccess" }}
+  type: {{ .externalAccess.type | default "NodePort" }}
+  {{- if and (eq .externalAccess.type "LoadBalancer") .externalAccess.loadBalancerIP }}
+  loadBalancerIP: {{ .externalAccess.loadBalancerIP }}
+  {{- end }}
+  {{- else }}
+  type: ClusterIP
+  {{- end }}
   ports:
     - name: kafka-ui
       port: 8080
       targetPort: 8080
       protocol: TCP
-      {{ if and (eq .type "NodePort") .nodePort }}
-      nodePort: {{ .nodePort }}
-      {{ end }}
-  {{ end }}
+      {{- if and (eq .externalAccess.type "NodePort") .externalAccess.nodePort }}
+      nodePort: {{ .externalAccess.nodePort }}
+      {{- end }}
   selector:
     app.kubernetes.io/name: kafka-ui
-{{ end }}
-{{ end }}
+{{- end }}
+{{- end }}

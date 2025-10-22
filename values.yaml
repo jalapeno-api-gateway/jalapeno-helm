@@ -38,7 +38,7 @@ processors:
   lslinknodeEdge:
     name: linkstate-edge
     replicas: 1
-    image: ghcr.io/jalapeno-api-gateway/jalapeno/linkstate-edge:v1.0.2-alpha
+    image: ghcr.io/jalapeno-api-gateway/jalapeno/linkstate-edge:v1.0.2
     # image: docker.io/iejalapeno/linkstate-edge:latest
     # resources:
     #   requests:
@@ -62,7 +62,7 @@ processors:
   topology:
     name: topology
     replicas: 1
-    image: ghcr.io/jalapeno-api-gateway/jalapeno/topology:v1.0.2-alpha
+    image: ghcr.io/jalapeno-api-gateway/jalapeno/topology:v1.0.2
     # image: docker.io/iejalapeno/topology:latest
     # image: docker.io/iejalapeno/topology:test20250829
     # resources:
@@ -108,15 +108,12 @@ messaging:
       enabled: true
       size: 1Gi
     externalAccess:
-      enabled: true
-      service:
-        type: LoadBalancer
-        loadBalancerIP: 10.5.0.133
+      loadBalancerIP: 10.5.0.133 # for now only LoadBalancer is supported
 
   kafkaUi:
     enabled: true
     image: ghcr.io/kafbat/kafka-ui:latest
-    service:
+    externalAccess:
       type: LoadBalancer
       loadBalancerIP: 10.5.0.134
 
