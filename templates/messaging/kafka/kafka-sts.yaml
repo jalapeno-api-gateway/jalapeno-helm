@@ -36,9 +36,9 @@ spec:
             - |
               export KAFKA_NODE_ID=${STATEFULSET_ORDINAL:-$(hostname | awk -F'-' '{print $NF}')}
               if [ "{{ if .externalAccess }}true{{ else }}false{{ end }}" = "true" ]; then
-                export KAFKA_ADVERTISED_LISTENERS="INTERNAL://kafka-$KAFKA_NODE_ID.kafka-headless:9092,CONTROLLER://kafka-$KAFKA_NODE_ID.kafka-headless:9093,EXTERNAL://{{- .externalAccess.loadBalancerIP }}:9094"
+                export KAFKA_ADVERTISED_LISTENERS="INTERNAL://kafka-$KAFKA_NODE_ID.kafka-headless.{{ $.Release.Namespace }}:9092,CONTROLLER://kafka-$KAFKA_NODE_ID.kafka-headless.{{ $.Release.Namespace }}:9093,EXTERNAL://{{- .externalAccess.loadBalancerIP }}:9094"
               else
-                export KAFKA_ADVERTISED_LISTENERS="INTERNAL://kafka-$KAFKA_NODE_ID.kafka-headless:9092,CONTROLLER://kafka-$KAFKA_NODE_ID.kafka-headless:9093"
+                export KAFKA_ADVERTISED_LISTENERS="INTERNAL://kafka-$KAFKA_NODE_ID.kafka-headless.{{ $.Release.Namespace }}:9092,CONTROLLER://kafka-$KAFKA_NODE_ID.kafka-headless.{{ $.Release.Namespace }}:9093"
               fi
               exec /etc/kafka/docker/run
           envFrom:
